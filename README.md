@@ -55,7 +55,58 @@ aws iam list-attached-role-policies \
 ########## aws ssm start ###############
 
 aws ssm start-session \
-  --target <new-instance-id> \
-  --region us-east-1
+ --target <new-instance-id> \
+ --region us-east-1
 
-##############################################
+#######verify you are using correct account and region and user in AWS#####
+
+aws sts get-caller-identity
+
+####### Create ECR Repositories ###############
+
+aws ecr create-repository \
+ --repository-name frontend \
+ --region us-east-1
+
+########### List of all ECR repository in a region #########
+
+aws ecr describe-repositories --region us-east-1
+
+########## Login to Amazon ECR "Login to ECR"#######
+
+NOTE - This command should execute where docker is installed already
+
+aws ecr get-login-password --region us-east-1 | \
+docker login \
+--username AWS \
+--password-stdin 027742774373.dkr.ecr.us-east-1.amazonaws.com
+
+############ Tag the docker image for push in ECR ########
+
+docker tag frontend-image:latest \
+027742774373.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
+docker tag student-service-image:latest \
+027742774373.dkr.ecr.us-east-1.amazonaws.com/student-service:latest
+
+docker tag teacher-service-image:latest \
+027742774373.dkr.ecr.us-east-1.amazonaws.com/teacher-service:latest
+
+docker tag attendance-service-image:latest \
+027742774373.dkr.ecr.us-east-1.amazonaws.com/attendance-service:latest
+
+docker tag notification-service-image:latest \
+027742774373.dkr.ecr.us-east-1.amazonaws.com/notification-service:latest
+
+########## Check the ECR Repositories ###########
+
+aws ecr describe-repositories --region us-east-1 --query "repositories[].repositoryName"
+
+########## To check the what changes made in the kubernetes manifest file add annotation and apply the manifest file once it is done you can varify this deployment##
+
+$ kubectl rollout history deployment/mysql -n dev
+
+######## check eks cluster addons list ###########
+
+aws eks list-addons \
+ --cluster-name osp-labs-eks-cluster \
+ --region us-east-1

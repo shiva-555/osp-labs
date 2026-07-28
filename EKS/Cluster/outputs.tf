@@ -13,3 +13,15 @@ output "eks_cluster_endpoint" {
 output "cluster_certificate_authority" {
   value = aws_eks_cluster.eks_cluster.certificate_authority[0].data
 }
+
+output "oidc_provider_url" {
+  value = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
+
+output "oidc_issuer_hostpath" {
+  value = replace(
+    aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer,
+    "https://",
+    ""
+  )
+}

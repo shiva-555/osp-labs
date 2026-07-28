@@ -128,6 +128,26 @@ module "IAM_eks_Node_Group_role" {
 }
 
 
+module "ebs_csi_role" {
+
+  source = "./IAM/EBS-CSI-Role"
+
+  project_name = var.project_name
+
+  oidc_provider_arn = module.irsa.oidc_provider_arn
+
+  oidc_provider_url = module.eks_cluster.oidc_provider_url
+}
+
+
+module "irsa" {
+
+  source = "./IAM/IRSA"
+
+  oidc_provider_url = module.eks_cluster.oidc_provider_url
+}
+
+
 ################## Security Group ######################
 
 
@@ -198,3 +218,17 @@ module "eks_node_group" {
   min_size     = var.min_size
   max_size     = var.max_size
 }
+
+########## eks addon ############
+
+module "eks_addons" {
+
+  source = "./EKS/AddOns"
+
+  eks_cluster_name = module.eks_cluster.eks_cluster_name
+
+  ebs_csi_role_arn = module.ebs_csi_role.ebs_csi_role_arn
+}
+
+
+
