@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: teacher-service
+  namespace: dev
+
+  labels:
+    app: teacher-service
+
+  annotations:
+    kubernetes.io/change-cause: "Initial Teacher Service Deployment"
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: teacher-service
+
+  template:
+    metadata:
+      labels:
+        app: teacher-service
+
+    spec:
+      containers:
+        - name: teacher-service
+
+          image: 027742774373.dkr.ecr.us-east-1.amazonaws.com/teacher-service:latest
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 3502
+
+          env:
+            - name: host
+              valueFrom:
+                configMapKeyRef:
+                  name: teacher-service-config
+                  key: DB_HOST
+
+            - name: user
+              valueFrom:
+                secretKeyRef:
+                  name: teacher-service-secret
+                  key: DB_USER
+
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  name: teacher-service-secret
+                  key: DB_PASSWORD
+
+            - name: database
+              valueFrom:
+                configMapKeyRef:
+                  name: teacher-service-config
+                  key: DB_NAME
+
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: teacher-service-config
+                  key: PORT
+
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: teacher-service-config
+                  key: NODE_ENV
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3502
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3502
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
