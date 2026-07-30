@@ -148,6 +148,18 @@ module "irsa" {
 }
 
 
+module "albcontroller-iam" {
+
+  source = "./IAM/ALB-Controller"
+
+  project_name = var.project_name
+
+  oidc_provider_arn = module.irsa.oidc_provider_arn
+
+  oidc_provider_url = module.irsa.oidc_provider_url
+}
+
+
 ################## Security Group ######################
 
 

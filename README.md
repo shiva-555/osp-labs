@@ -111,7 +111,6 @@ aws eks list-addons \
  --cluster-name osp-labs-eks-cluster \
  --region us-east-1
 
-
 ######## when your service is clusterip and it is in private subnet then you can still access your application by port forwarding ###########
 
 kubectl port-forward svc/frontend 8080:80 -n dev
